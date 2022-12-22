@@ -2,8 +2,8 @@ import pickle
 import time
 import torch
 
-from common import MemoryMonitor, create_list
-from common import DatasetFromList as NaiveDatasetFromList
+from common import MemoryMonitor, create_list, DatasetFromList
+from serialize import NumpySerializedList
 
 
 def worker(_, dataset: torch.utils.data.Dataset):
@@ -16,7 +16,7 @@ def worker(_, dataset: torch.utils.data.Dataset):
 
 if __name__ == "__main__":
   monitor = MemoryMonitor()
-  ds = NaiveDatasetFromList(create_list())
+  ds = DatasetFromList(NumpySerializedList(create_list()))
   print(monitor.table())
 
   ctx = torch.multiprocessing.start_processes(

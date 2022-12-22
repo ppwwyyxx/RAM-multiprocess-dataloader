@@ -1,4 +1,5 @@
 from collections import defaultdict
+import torch
 import json
 from typing import Any
 from tabulate import tabulate
@@ -67,8 +68,16 @@ def create_list() -> list[Any]:
     return obj["annotations"]
 
 
+class DatasetFromList(torch.utils.data.Dataset):
+  def __init__(self, lst):
+    self.lst = lst
+  def __len__(self):
+    return len(self.lst)
+  def __getitem__(self, idx: int):
+    return self.lst[idx]
+
+
 if __name__ == "__main__":
-  # import torch
   monitor = MemoryMonitor()
   print(monitor.str())
   lst = create_list()
