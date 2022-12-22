@@ -63,6 +63,7 @@ class MemoryMonitor():
 
 
 def create_list() -> list[Any]:
+  # Download from https://huggingface.co/datasets/merve/coco/resolve/main/annotations/instances_train2017.json
   with open("instances_train2017.json") as f:
     obj = json.load(f)
     return obj["annotations"]
