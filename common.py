@@ -78,9 +78,12 @@ class DatasetFromList(torch.utils.data.Dataset):
 
 
 if __name__ == "__main__":
+  from serialize import NumpySerializedList
   monitor = MemoryMonitor()
-  print(monitor.str())
+  print("Initial", monitor.str())
   lst = create_list()
-  print(monitor.str())
+  print("JSON", monitor.str())
+  lst = NumpySerializedList(lst)
+  print("Serialized", monitor.str())
   del lst; import gc; gc.collect()
-  print(monitor.str())
+  print("End", monitor.str())

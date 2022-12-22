@@ -1,4 +1,3 @@
-[12/21 17:03:55 d2.data.common]: Serializing the dataset using: <class 'serialize.NumpySerializedList'>
 [12/21 17:03:55 detectron2]: Serializing 860001 elements to byte tensors and concatenating them all ...
 [12/21 17:03:57 detectron2]: Serialized dataset takes 505.05 MiB
   time     PID  rss    pss    uss    shared    shared_file
