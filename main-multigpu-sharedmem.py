@@ -12,7 +12,7 @@ from detectron2.utils import logger
 logger.setup_logger()
 
 from common import MemoryMonitor, create_list, DatasetFromList
-from serialize import TorchSerializedList
+from serialize import TorchShmSerializedList
 
 def worker(_, dataset: torch.utils.data.Dataset):
   while True:
@@ -24,7 +24,9 @@ def worker(_, dataset: torch.utils.data.Dataset):
 
 def main():
   monitor = MemoryMonitor()
-  ds = DatasetFromList(TorchSerializedList(create_list()))
+  ds = DatasetFromList(TorchShmSerializedList(
+      # Only GPU worker 0 needs to read data.
+      create_list() if comm.get_local_rank() == 0 else None))
   print(monitor.table())
 
   mp.set_forkserver_preload(["torch"])
@@ -46,8 +48,12 @@ def main():
     ctx.join()
 
 if __name__ == "__main__":
+  mp.set_forkserver_preload(["torch"])
   num_gpus = 2
   if torch.cuda.device_count() < num_gpus:
     # We don't actually need GPUs anyway.
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
+  # This uses "spawn" internally. To switch to forkserver, modifying
+  # detectron2 source code is needed.
   launch(main, num_gpus, dist_url="auto")
