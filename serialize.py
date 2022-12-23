@@ -63,16 +63,17 @@ class TorchShmSerializedList(TorchSerializedList):
         if comm.get_local_rank() == 0:
             super().__init__(lst)
         if comm.get_local_size() == 1:
+            # Just one GPU on this machine. Do nothing.
             return
         if comm.get_local_rank() == 0:
             # Move to shared memory, obtain a handle.
             serialized = bytes(mp.reduction.ForkingPickler.dumps(
                 (self._addr, self._lst)))
-            # Broadcast the handle to shared memory.
+            # Broadcast the handle of shared memory to other GPU workers.
             comm.all_gather(serialized)
         else:
             serialized = comm.all_gather(None)[comm.get_rank() - comm.get_local_rank()]
-            # Load from shared memory.
+            # Materialize a tensor from shared memory.
             self._addr, self._lst = mp.reduction.ForkingPickler.loads(serialized)
             logger.info(f"Worker {comm.get_rank()} obtains a dataset of length="
                         f"{len(self)} from its local leader.")
