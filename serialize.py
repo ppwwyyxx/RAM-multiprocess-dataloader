@@ -1,6 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 """
-List serialization code taken from
+List serialization code adopted from
 https://github.com/facebookresearch/detectron2/blob/main/detectron2/data/common.py
 """
 
@@ -16,8 +16,6 @@ logger = logger.setup_logger()
 
 class NumpySerializedList():
     def __init__(self, lst: list):
-        self._lst = lst
-
         def _serialize(data):
             buffer = pickle.dumps(data, protocol=-1)
             return np.frombuffer(buffer, dtype=np.uint8)
@@ -27,7 +25,7 @@ class NumpySerializedList():
                 len(self._lst)
             )
         )
-        self._lst = [_serialize(x) for x in self._lst]
+        self._lst = [_serialize(x) for x in lst]
         self._addr = np.asarray([len(x) for x in self._lst], dtype=np.int64)
         self._addr = np.cumsum(self._addr)
         self._lst = np.concatenate(self._lst)
