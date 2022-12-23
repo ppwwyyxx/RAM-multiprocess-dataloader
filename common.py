@@ -9,13 +9,13 @@ import psutil
 
 def get_mem_info(pid: int) -> dict[str, int]:
   res = defaultdict(int)
-  for page in psutil.Process(pid).memory_maps():
-    res['rss'] += page.rss
-    res['pss'] += page.pss
-    res['uss'] += page.private_clean + page.private_dirty
-    res['shared'] += page.shared_clean + page.shared_dirty
-    if page.path.startswith('/'):
-      res['shared_file'] += page.shared_clean + page.shared_dirty
+  for mmap in psutil.Process(pid).memory_maps():
+    res['rss'] += mmap.rss
+    res['pss'] += mmap.pss
+    res['uss'] += mmap.private_clean + mmap.private_dirty
+    res['shared'] += mmap.shared_clean + mmap.shared_dirty
+    if mmap.path.startswith('/'):
+      res['shared_file'] += mmap.shared_clean + mmap.shared_dirty
   return res
 
 class MemoryMonitor():

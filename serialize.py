@@ -1,3 +1,4 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
 """
 List serialization code taken from
 https://github.com/facebookresearch/detectron2/blob/main/detectron2/data/common.py
@@ -91,17 +92,18 @@ class TorchShmSerializedList(TorchSerializedList):
             self._addr = torch.from_numpy(np.cumsum(self._addr))
             self._lst = torch.from_numpy(np.concatenate(self._lst))
             logger.info("Serialized dataset takes {:.2f} MiB".format(len(self._lst) / 1024**2))
+        if comm.get_local_size() == 1:
+            return
 
+        if comm.get_local_rank() == 0:
             # Move to shared memory, obtain a handle.
             serialized = bytes(mp.reduction.ForkingPickler.dumps(
                 (self._addr, self._lst)))
+            # Broadcast the handle to shared memory.
+            comm.all_gather(serialized)
         else:
-            serialized = None
-        # Broadcast the handle to shared memory.
-        serialized = comm.all_gather(serialized)[0]
-        if comm.get_local_rank() != 0:
+            serialized = comm.all_gather(None)[comm.get_rank() - comm.get_local_rank()]
             # Load from shared memory.
             self._addr, self._lst = mp.reduction.ForkingPickler.loads(serialized)
-        if comm.get_local_rank() != 0:
             logger.info(f"Worker {comm.get_rank()} obtains a dataset of length="
                         f"{len(self)} from its local leader.")
