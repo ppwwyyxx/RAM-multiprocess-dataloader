@@ -7,6 +7,7 @@ import os
 import time
 import psutil
 
+
 def get_mem_info(pid: int) -> dict[str, int]:
   res = defaultdict(int)
   for mmap in psutil.Process(pid).memory_maps():
@@ -17,6 +18,7 @@ def get_mem_info(pid: int) -> dict[str, int]:
     if mmap.path.startswith('/'):
       res['shared_file'] += mmap.shared_clean + mmap.shared_dirty
   return res
+
 
 class MemoryMonitor():
   def __init__(self, pids: list[int]=None):

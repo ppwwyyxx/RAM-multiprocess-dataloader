@@ -1,16 +1,13 @@
 #!/usr/bin/env python
-import os
-import time
 import itertools
-import pickle
 import multiprocessing as mp
+import os
+import pickle
+import time
 import torch
 
 import detectron2.utils.comm as comm
 from detectron2.engine import launch
-
-from detectron2.utils import logger
-logger.setup_logger()
 
 from common import MemoryMonitor, create_list, DatasetFromList
 from serialize import TorchShmSerializedList
