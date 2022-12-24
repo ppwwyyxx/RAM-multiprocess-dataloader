@@ -12,6 +12,7 @@ explains why it happens, and how to avoid the 40x RAM usage.
 This github repo contains code and results for the above article.
 
 ### Dependencies
+* Linux
 * PyTorch
 * [psutil](https://github.com/giampaolo/psutil): `pip install psutil`
-* Detectron2 for `main-multigpu*.py`: [installation from source](https://detectron2.readthedocs.io/en/latest/tutorials/install.html#build-detectron2-from-source) is required.
+* Detectron2 and GPUs for `main-multigpu*.py`: [installation instructions](https://detectron2.readthedocs.io/en/latest/tutorials/install.html)
