@@ -9,7 +9,7 @@ import torch
 import detectron2.utils.comm as comm
 from detectron2.engine import launch
 
-from common import MemoryMonitor, create_list, DatasetFromList
+from common import MemoryMonitor, create_coco, DatasetFromList
 from serialize import TorchSerializedList
 
 def worker(_, dataset: torch.utils.data.Dataset):
@@ -22,7 +22,7 @@ def worker(_, dataset: torch.utils.data.Dataset):
 
 def main():
   monitor = MemoryMonitor()
-  ds = DatasetFromList(TorchSerializedList(create_list()))
+  ds = DatasetFromList(TorchSerializedList(create_coco()))
   print(monitor.table())
 
   mp.set_forkserver_preload(["torch"])

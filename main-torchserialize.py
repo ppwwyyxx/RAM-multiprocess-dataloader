@@ -5,7 +5,7 @@ import time
 import torch
 import multiprocessing as mp
 
-from common import MemoryMonitor, create_list, DatasetFromList
+from common import MemoryMonitor, create_coco, DatasetFromList
 from serialize import TorchSerializedList
 
 
@@ -20,7 +20,7 @@ def worker(_, dataset: torch.utils.data.Dataset):
 if __name__ == "__main__":
   start_method = sys.argv[1]
   monitor = MemoryMonitor()
-  ds = DatasetFromList(TorchSerializedList(create_list()))
+  ds = DatasetFromList(TorchSerializedList(create_coco()))
   print(monitor.table())
   if start_method == "forkserver":
     # Reduce 150M-per-process USS due to "import torch".

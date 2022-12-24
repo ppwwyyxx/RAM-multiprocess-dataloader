@@ -3,7 +3,7 @@ import pickle
 import time
 import torch
 
-from common import MemoryMonitor, create_list
+from common import MemoryMonitor, create_coco
 from common import DatasetFromList as NaiveDatasetFromList
 
 
@@ -17,7 +17,7 @@ def worker(_, dataset: torch.utils.data.Dataset):
 
 if __name__ == "__main__":
   monitor = MemoryMonitor()
-  ds = NaiveDatasetFromList(create_list())
+  ds = NaiveDatasetFromList(create_coco())
   print(monitor.table())
 
   ctx = torch.multiprocessing.start_processes(

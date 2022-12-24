@@ -4,7 +4,7 @@ import pickle
 import time
 import torch
 
-from common import MemoryMonitor, create_list, DatasetFromList
+from common import MemoryMonitor, create_coco, DatasetFromList
 from serialize import NumpySerializedList
 
 
@@ -20,7 +20,7 @@ if __name__ == "__main__":
   start_method = sys.argv[1] if len(sys.argv) == 2 else 'fork'
 
   monitor = MemoryMonitor()
-  ds = DatasetFromList(NumpySerializedList(create_list()))
+  ds = DatasetFromList(NumpySerializedList(create_coco()))
   print(monitor.table())
 
   ctx = torch.multiprocessing.start_processes(

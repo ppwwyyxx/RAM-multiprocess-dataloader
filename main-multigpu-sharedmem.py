@@ -9,7 +9,7 @@ import torch
 import detectron2.utils.comm as comm
 from detectron2.engine import launch
 
-from common import MemoryMonitor, create_list, DatasetFromList
+from common import MemoryMonitor, create_coco, DatasetFromList
 from serialize import TorchShmSerializedList
 
 def worker(_, dataset: torch.utils.data.Dataset):
@@ -24,7 +24,7 @@ def main():
   monitor = MemoryMonitor()
   ds = DatasetFromList(TorchShmSerializedList(
       # Don't read data except for GPU worker 0! Otherwise we waste time and (maybe) RAM.
-      create_list() if comm.get_local_rank() == 0 else []))
+      create_coco() if comm.get_local_rank() == 0 else []))
   print(monitor.table())
 
   mp.set_forkserver_preload(["torch"])

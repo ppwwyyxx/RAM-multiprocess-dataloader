@@ -64,7 +64,7 @@ class MemoryMonitor():
     return "%.1f%s" % (size, unit)
 
 
-def create_list() -> list[Any]:
+def create_coco() -> list[Any]:
   # Download from https://huggingface.co/datasets/merve/coco/resolve/main/annotations/instances_train2017.json
   with open("instances_train2017.json") as f:
     obj = json.load(f)
@@ -84,7 +84,7 @@ if __name__ == "__main__":
   from serialize import NumpySerializedList
   monitor = MemoryMonitor()
   print("Initial", monitor.str())
-  lst = create_list()
+  lst = create_coco()
   print("JSON", monitor.str())
   lst = NumpySerializedList(lst)
   print("Serialized", monitor.str())
