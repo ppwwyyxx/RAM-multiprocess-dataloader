@@ -9,10 +9,6 @@ import pickle
 import numpy as np
 import torch
 
-from detectron2.utils import logger
-from detectron2.utils import comm
-logger = logger.setup_logger()
-
 
 class NumpySerializedList():
     def __init__(self, lst: list):
@@ -20,16 +16,16 @@ class NumpySerializedList():
             buffer = pickle.dumps(data, protocol=-1)
             return np.frombuffer(buffer, dtype=np.uint8)
 
-        logger.info(
+        print(
             "Serializing {} elements to byte tensors and concatenating them all ...".format(
-                len(self._lst)
+                len(lst)
             )
         )
         self._lst = [_serialize(x) for x in lst]
         self._addr = np.asarray([len(x) for x in self._lst], dtype=np.int64)
         self._addr = np.cumsum(self._addr)
         self._lst = np.concatenate(self._lst)
-        logger.info("Serialized dataset takes {:.2f} MiB".format(len(self._lst) / 1024**2))
+        print("Serialized dataset takes {:.2f} MiB".format(len(self._lst) / 1024**2))
 
     def __len__(self):
         return len(self._addr)
@@ -58,6 +54,8 @@ class TorchSerializedList(NumpySerializedList):
 # has another implementation that does not use tensors.
 class TorchShmSerializedList(TorchSerializedList):
     def __init__(self, lst: list):
+        from detectron2.utils import comm
+
         if comm.get_local_rank() == 0:
             super().__init__(lst)
         if comm.get_local_size() == 1:
@@ -73,5 +71,5 @@ class TorchShmSerializedList(TorchSerializedList):
             serialized = comm.all_gather(None)[comm.get_rank() - comm.get_local_rank()]
             # Materialize a tensor from shared memory.
             self._addr, self._lst = mp.reduction.ForkingPickler.loads(serialized)
-            logger.info(f"Worker {comm.get_rank()} obtains a dataset of length="
-                        f"{len(self)} from its local leader.")
+            print(f"Worker {comm.get_rank()} obtains a dataset of length="
+                  f"{len(self)} from its local leader.")

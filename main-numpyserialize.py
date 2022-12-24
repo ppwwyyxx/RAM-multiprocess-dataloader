@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import sys
 import pickle
 import time
 import torch
@@ -16,13 +17,15 @@ def worker(_, dataset: torch.utils.data.Dataset):
 
 
 if __name__ == "__main__":
+  start_method = sys.argv[1] if len(sys.argv) == 2 else 'fork'
+
   monitor = MemoryMonitor()
   ds = DatasetFromList(NumpySerializedList(create_list()))
   print(monitor.table())
 
   ctx = torch.multiprocessing.start_processes(
       worker, (ds, ), nprocs=4, join=False,
-      daemon=True, start_method='fork')
+      daemon=True, start_method=start_method)
   [monitor.add_pid(pid) for pid in ctx.pids()]
 
   try:

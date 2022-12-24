@@ -1,6 +1,6 @@
-[12/22 16:28:08 detectron2]: Serializing 860001 elements to byte tensors and concatenating them all ...
-[12/22 16:28:10 detectron2]: Serialized dataset takes 505.05 MiB
-[12/22 16:28:11 detectron2]: Worker 1 obtains a dataset of length=860001 from its local leader.
+Serializing 860001 elements to byte tensors and concatenating them all ...
+Serialized dataset takes 505.05 MiB
+Worker 1 obtains a dataset of length=860001 from its local leader.
   time      PID  rss     pss     uss     shared    shared_file
 ------  -------  ------  ------  ------  --------  -------------
  24524  1533911  371.2M  238.8M  189.6M  181.6M    181.6M

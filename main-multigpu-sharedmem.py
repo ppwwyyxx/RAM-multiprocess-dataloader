@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import time
 import itertools
@@ -25,8 +26,8 @@ def worker(_, dataset: torch.utils.data.Dataset):
 def main():
   monitor = MemoryMonitor()
   ds = DatasetFromList(TorchShmSerializedList(
-      # Only GPU worker 0 needs to read data.
-      create_list() if comm.get_local_rank() == 0 else None))
+      # Don't read data except for GPU worker 0! Otherwise we waste time and (maybe) RAM.
+      create_list() if comm.get_local_rank() == 0 else []))
   print(monitor.table())
 
   mp.set_forkserver_preload(["torch"])
