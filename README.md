@@ -14,5 +14,5 @@ This github repo contains code and results for the above article.
 ### Dependencies
 * Linux
 * PyTorch
-* [psutil](https://github.com/giampaolo/psutil): `pip install psutil`
-* Detectron2 and GPUs for `main-multigpu*.py`: [installation instructions](https://detectron2.readthedocs.io/en/latest/tutorials/install.html)
+* `python -m pip install psutil tabulate`
+* Detectron2 and GPUs needed only for `main-multigpu*.py`: [installation instructions](https://detectron2.readthedocs.io/en/latest/tutorials/install.html)
