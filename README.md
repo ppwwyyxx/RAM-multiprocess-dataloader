@@ -12,7 +12,8 @@ explains why it happens, and how to avoid the 40x RAM usage.
 This github repo contains code and results for the above article.
 
 ### Dependencies
+* Python >= 3.7
 * Linux
-* PyTorch
+* PyTorch >= 1.10
 * `python -m pip install psutil tabulate`
 * Detectron2 and GPUs needed only for `main-multigpu*.py`: [installation instructions](https://detectron2.readthedocs.io/en/latest/tutorials/install.html)
