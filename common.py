@@ -1,5 +1,7 @@
 from __future__ import annotations
 from collections import defaultdict
+import pickle
+import sys
 import torch
 import json
 from typing import Any
@@ -22,7 +24,7 @@ def get_mem_info(pid: int) -> dict[str, int]:
 
 
 class MemoryMonitor():
-  def __init__(self, pids: list[int]=None):
+  def __init__(self, pids: list[int] = None):
     if pids is None:
       pids = [os.getpid()]
     self.pids = pids
@@ -70,6 +72,18 @@ def create_coco() -> list[Any]:
   with open("instances_train2017.json") as f:
     obj = json.load(f)
     return obj["annotations"]
+
+
+def read_sample(x):
+  # A function that is supposed to read object x, incrementing its refcount.
+  # This mimics what a real dataloader would do.
+  if sys.version_info >= (3, 10, 6):
+    # Before this version, pickle does not increment refcount. This is a bug that's
+    # fixed in https://github.com/python/cpython/pull/92931.
+    return pickle.dumps(x)
+  else:
+    import msgpack
+    return msgpack.dumps(x)
 
 
 class DatasetFromList(torch.utils.data.Dataset):

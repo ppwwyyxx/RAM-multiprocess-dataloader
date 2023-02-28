@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-import pickle
 import sys
 import time
 import torch
 import multiprocessing as mp
 
-from common import MemoryMonitor, create_coco, DatasetFromList
+from common import MemoryMonitor, create_coco, DatasetFromList, read_sample
 from serialize import TorchSerializedList
 
 
@@ -14,7 +13,7 @@ def worker(_, dataset: torch.utils.data.Dataset):
     for sample in dataset:
       # read the data, with a fake latency
       time.sleep(0.000001)
-      result = pickle.dumps(sample)
+      result = read_sample(sample)
 
 
 if __name__ == "__main__":

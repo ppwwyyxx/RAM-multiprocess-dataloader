@@ -15,5 +15,5 @@ This github repo contains code and results for the above article.
 * Python >= 3.7
 * Linux
 * PyTorch >= 1.10
-* `python -m pip install psutil tabulate`
+* `python -m pip install psutil tabulate msgpack`
 * Detectron2 and GPUs needed only for `main-multigpu*.py`: [installation instructions](https://detectron2.readthedocs.io/en/latest/tutorials/install.html)
