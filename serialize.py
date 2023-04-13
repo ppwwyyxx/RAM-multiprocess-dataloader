@@ -4,10 +4,16 @@ List serialization code adopted from
 https://github.com/facebookresearch/detectron2/blob/main/detectron2/data/common.py
 """
 
+from typing import List, Any, Optional
 import multiprocessing as mp
 import pickle
 import numpy as np
 import torch
+
+try:
+    from detectron2.utils import comm
+except ImportError:
+    pass
 
 
 class NumpySerializedList():
@@ -50,26 +56,46 @@ class TorchSerializedList(NumpySerializedList):
         return pickle.loads(bytes)
 
 
+
+def local_scatter(array: Optional[List[Any]]):
+    """
+    Scatter an array from local leader to all local workers.
+    The i-th local worker gets array[i].
+
+    Args:
+        array: Array with same size of #local workers.
+    """
+    if comm.get_local_size() == 1:
+        # Just one worker. Do nothing.
+        return array[0]
+    if comm.get_local_rank() == 0:
+        assert len(array) == comm.get_local_size()
+        comm.all_gather(array)
+    else:
+        all_data = comm.all_gather(None)
+        array = all_data[comm.get_rank() - comm.get_local_rank()]
+    return array[comm.get_local_rank()]
+
+
 # NOTE: https://github.com/facebookresearch/mobile-vision/pull/120
 # has another implementation that does not use tensors.
 class TorchShmSerializedList(TorchSerializedList):
     def __init__(self, lst: list):
-        from detectron2.utils import comm
-
         if comm.get_local_rank() == 0:
             super().__init__(lst)
-        if comm.get_local_size() == 1:
-            # Just one GPU on this machine. Do nothing.
-            return
         if comm.get_local_rank() == 0:
-            # Move to shared memory, obtain a handle.
-            serialized = bytes(mp.reduction.ForkingPickler.dumps(
-                (self._addr, self._lst)))
-            # Broadcast the handle of shared memory to other GPU workers.
-            comm.all_gather(serialized)
+            # Move data to shared memory, obtain a handle to send to each local worker.
+            # This is cheap because a tensor will only be moved to shared memory once.
+            handles = [None] + [
+              bytes(mp.reduction.ForkingPickler.dumps((self._addr, self._lst)))
+              for _ in range(comm.get_local_size() - 1)]
         else:
-            serialized = comm.all_gather(None)[comm.get_rank() - comm.get_local_rank()]
-            # Materialize a tensor from shared memory.
-            self._addr, self._lst = mp.reduction.ForkingPickler.loads(serialized)
+            handles = None
+        # Each worker receives the handle from local leader.
+        handle = local_scatter(handles)
+
+        if comm.get_local_rank() > 0:
+            # Materialize the tensor from shared memory.
+            self._addr, self._lst = mp.reduction.ForkingPickler.loads(handle)
             print(f"Worker {comm.get_rank()} obtains a dataset of length="
                   f"{len(self)} from its local leader.")
